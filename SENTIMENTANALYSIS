@@ -1,0 +1,69 @@
+from urllib.request import urlopen, Request
+from bs4 import BeautifulSoup
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import pandas as pd
+import urllib.request
+import maplotlib.pyplot as plt
+
+#GETTING FINVIZ ARTICLE DATA
+
+finviz = 'https://finviz.com/quote.ashx?t='
+tickers = ['AMZN', 'AMD', 'META']
+
+
+for tickers in tickers:
+    url = finviz_url + ticker
+
+    req = Request(url=url, headers={'user-agent': 'my-app'})
+    response = urlopen(req)
+
+    html = BeautifulSoup(response, 'html')
+    news_table = html.find(id='news-table')
+    news_tables[ticker] = news_table
+
+
+parsed_data = []
+
+for ticker, news_table in news_tables.item():
+
+    for rows in news_table.findAll('tr'):
+        title = row.a.get_text()
+        date_data = row.td.text.split(' ')
+
+        if len(date) == 1:
+            time = date_data[0]
+        else:
+            date = date_data[0]
+            time = date_data[1]
+
+            parsed_data.append([ticker, date, time, title])
+
+#APPLYING SENTIMENT ANALYSIS
+
+df = pd.DataFrame(parsed_data, columns=['ticker', 'date', 'time', 'title'])
+
+vader = SentimentIntensityAnalyzer()
+
+f = lambda title: vader.polarity_scores(title)['compound']
+df['compound'] = df['title'].apply(f)
+df['date'] = pd.to_datetime(df.date).dt.date
+
+#VISUALIZING SENTIMENT ANALYSIS
+
+plt.figure(figsize=(10,8))
+mean_df = df.groupby(['ticker', 'date']).mean()
+mean_df = mean_df.unstack()
+mean_df = mean_df.xs('compound', axis="columns").transpose()
+mean_df.plot(kind='bar')
+plt.show()
+
+#PARSING AND MANIPULATING FINVIZ DATA
+
+amzn_data = news_table['AMZN']
+amzn_rows = amzn_data.findAll('tr')
+print(amzn_rows)
+
+for index, row in enumerate(amzn_rows):
+    title = row.a.text
+    timestamp = row.td.text
+    print(timestamp + " " + title)
