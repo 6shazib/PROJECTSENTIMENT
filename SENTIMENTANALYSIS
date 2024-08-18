@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import pandas as pd
 import urllib.request
-import maplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 #GETTING FINVIZ ARTICLE DATA
 
