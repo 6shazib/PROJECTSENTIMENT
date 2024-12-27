@@ -6,6 +6,9 @@ from alpaca_trade_api import REST
 import time
 
 # Fetch historical data
+
+#Shaz this code is ass
+
 symbol = 'AAPL'
 start_date = '2015-01-01'
 end_date = '2022-12-31'
